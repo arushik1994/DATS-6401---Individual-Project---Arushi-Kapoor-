@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1024, initial-scale=1.0">
+    <title>Per Capita Spending</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {'packages': ['corechart', 'geochart']});
+        google.charts.setOnLoadCallback(drawAllSheets);
+
+        function drawAllSheets() {
+            drawSheetName('gdpcapita', 'SELECT A,O,W', educapitaSpendingResponseHandler);
+            drawSheetName('relationship', 'SELECT A,D,E,F,G', edugdpResponseHandler); 
+            drawSheetName('gdpcapita', 'SELECT A,G,W', healthcapitaSpendingResponseHandler);
+            drawSheetName('relationship', 'SELECT A,C,E,F,G', healthgdpResponseHandler); 
+            drawSheetName('militarycapita', 'SELECT A,G,O', milcapitaSpendingResponseHandler);
+            drawSheetName('relationship','SELECT A,B,E,F,G', milgdpResponseHandler);
+        } //drawAllSheets
+
+        function drawSheetName(sheetName, query, responseHandler){
+            var queryString =encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1bnXp3KjjQwR_d0VO_wCrhURjjAzWk60QoO0QnJ9dQ-c/gviz/tq?sheet='
+                + sheetName + '&headers=1&tq=' + queryString);
+
+            query.send(responseHandler);
+        } //drawSheetName
+
+        function checkError(response){
+            if (response.isError()) {
+                alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                return;
+            }
+
+        } //checkError
+
+        function educapitaSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 2, desc: true});
+
+            var options = {
+                legend: {position: 'top', maxLines: 3}, 
+                isStacked: false,
+                colors: ['red','green'],
+                annotations: {alwaysOutside: true}, 
+                title: 'Per Capita Education Spending vs. Per Capita GDP',
+                vAxis: {title: 'US Dollar Amount'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("educapita_spending_div"));
+            chart.draw(data, options);
+        } //educapitaSpendingResponseHandler
+        
+        function edugdpResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+	        var options = {
+                   title: 'Correlation between Per Capita Education Spending & Per Capita GDP',
+				   vAxis:{title:'GDP Per Capita ($)'},
+				   hAxis:{title:'Education Spending Per Capita ($)'},
+                   bubble:{textStyle: {fontSize: 2, auraColor: 'none'}},
+				   legend:{
+					   position: "top",
+					   maxLines: 2},
+                   backgroundColor: 'none'
+            };
+            var chart = new google.visualization.BubbleChart(document.getElementById("edugdpcap_div"));
+            chart.draw(data, options); 
+        }//edugdpResponseHandler
+
+        function healthcapitaSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 2, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                isStacked: false,
+                colors: ['red','green'],
+                annotations: {alwaysOutside: true}, 
+                title: 'Per Capita Healthcare Spending vs. Per Capita GDP',
+                vAxis: {title: 'US Dollar Amount'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("healthcapita_spending_div"));
+            chart.draw(data, options);
+        } //healthcapitaSpendingResponseHandler
+
+        function healthgdpResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+	        var options = {
+                   title: 'Correlation between Per Capita Health Spending & Per Capita GDP',
+				   vAxis:{title:'GDP Per Capita ($)'},
+				   hAxis:{title:'Health Spending Per Capita ($)'},
+                   bubble:{textStyle: {fontSize: 2, auraColor: 'none'}},
+				   legend:{
+					   position: "top",
+					   maxLines: 2},
+                   backgroundColor: 'none'
+            };
+            var chart = new google.visualization.BubbleChart(document.getElementById("healthgdpcap_div"));
+            chart.draw(data, options); 
+        }//healthgdpResponseHandler
+        
+        function milcapitaSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 2, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                isStacked: false,
+                colors: ['red','green'],
+                annotations: {alwaysOutside: true}, 
+                title: 'Per Capita Military Spending vs. Per Capita GDP',
+                vAxis: {title: 'US Dollar Amount'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("milcapita_spending_div"));
+            chart.draw(data, options);
+        } //milcapitaSpendingResponseHandler
+
+        function milgdpResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+	        var options = {
+                   title: 'Correlation between Per Capita Military Spending & Per Capita GDP',
+				   vAxis:{title:'GDP Per Capita ($)'},
+				   hAxis:{title:'Military Spending Per Capita ($)'},
+                   bubble:{textStyle: {fontSize: 2, auraColor: 'none'}},
+				   legend:{
+					   position: "top",
+					   maxLines: 2},
+                   backgroundColor: 'none'
+            };
+            var chart = new google.visualization.BubbleChart(document.getElementById("milgdpcap_div"));
+            chart.draw(data, options); 
+        }//milgdpResponseHandler
+
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="header">
+            <div id="logo">
+                <div id="logo_text">
+                    <h1><a href="index.html">Visualization Project</a></h1>
+                </div><!-- logo_text -->
+            </div><!-- logo-->
+            <div id="menubar">
+                <ul id="menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li class="selected"><a href="percapita.html">Per Capita Spending</a></li>
+                    <li><a href="growth.html">Growth</a></li>
+                    <li><a href="prediction.html">Prediction</a></li>
+                    <li><a href="conclusion.html">Conclusion</a></li>
+                </ul><!-- menu -->  
+            </div><!-- menu -->
+        </div><!-- header -->
+        <div id="site_content">
+            <div id="content">
+    <p><br>
+        This section explores the nations' per capita spending in comparison to its' per capita GDP.<br><br>
+        Average of GDP per capita, military spending per capita, education spending per capita and healthcare spending per capita are calculated for each country over the given time period. These comparisons are visualized through bar and column charts.
+    </p>
+    <h3 style='text-align:center'>Education Spending vs. GDP</h3>
+    <div id="educapita_spending_div" style="width: 900px; height:500px;"></div>
+    <div id="edugdpcap_div" style="width: 900px; height:500px;"></div>
+    <h3 style='text-align:center'>Healthcare Spending vs. GDP</h3>
+    <div id="healthcapita_spending_div" style="width: 900px; height:500px;"></div>
+    <div id="healthgdpcap_div" style="width: 900px; height:500px;"></div>
+    <h3 style='text-align:center'>Military Spending vs. GDP</h3>
+    <div id="milcapita_spending_div" style="width: 900px; height:500px;"></div>
+    <div id="milgdpcap_div" style="width: 900px; height:500px;"></div>
+    <h3 style='text-align:center'>Key Insights</h3>
+    <p>
+        1.&nbsp;&nbsp;USA leads in average GDP per capita for the given time period.<br>
+        2.&nbsp;&nbsp;USA leads in both average healthcare spending per capita and military spending per capita for the given time period.<br> 
+        3.&nbsp;&nbsp;Australia leads in average education spending per capita for the given time period.<br>
+        4.&nbsp;&nbsp;China has the lowest average GDP per capita for the given time period.<br>
+        5.&nbsp;&nbsp;China ranks the lowest in average healthcare, education and military spending per capita for the given time period.<br>
+        6.&nbsp;&nbsp;A positive correlation exists between GDP per capita and education spending per capita for the given time period.<br> 
+        7.&nbsp;&nbsp;A positive correlation exists between GDP per capita and healthcare spending per capita in most countries for the given time period. 
+    </p>
+</div><!-- content -->
+</div><!-- site_content -->
+<div id="content_footer">
+    <div id="footer">
+        &copy; <script>var d = new Date(); document.write(d.getFullYear());</script> 
+        | <a href="http://validator.w3.org/check?uri=referer">HTML5</a>
+        | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS3</a>
+        | Arushi Kapoor
+    </div><!-- footer -->
+</div><!-- content_footer --> 
+</div> <!-- main -->
+</body>
+</html>
