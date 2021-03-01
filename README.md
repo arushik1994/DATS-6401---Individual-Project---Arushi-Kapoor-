@@ -1,1 +1,1 @@
-# DATS-6401---Individual-Project---Arushi-Kapoor-
+# DATS-6401---Individual-Project---Arushi-Kapoor
