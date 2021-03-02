@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {'packages': ['corechart', 'geochart']});
+        google.charts.setOnLoadCallback(drawAllSheets);
+
+        function drawAllSheets() {
+            drawSheetName('educationspending', 'SELECT A,G', egSpendingResponseHandler);
+            drawSheetName('healthspending', 'SELECT A,G', hgSpendingResponseHandler);
+            drawSheetName('educationspending', 'SELECT A,H,I', educomboResponseHandler);
+            drawSheetName('healthspending', 'SELECT A,H,I', healthcomboResponseHandler); 
+        } //drawAllSheets
+
+        function drawSheetName(sheetName, query, responseHandler){
+            var queryString =encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1bnXp3KjjQwR_d0VO_wCrhURjjAzWk60QoO0QnJ9dQ-c/gviz/tq?sheet='
+                + sheetName + '&headers=1&tq=' + queryString);
+
+            query.send(responseHandler);
+        } //drawSheetName
+
+        function checkError(response){
+            if (response.isError()) {
+                alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                return;
+            }
+
+        } //checkError
+
+        function egSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                annotations: {alwaysOutside: true}, 
+                colors: ['grey'],
+                title: 'Difference in Education Spending',
+                vAxis: {title: 'Dollar Difference in Spending (Millions)'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("eg_spending_div"));
+            chart.draw(data, options);
+        } //egSpendingResponseHandler
+
+        function hgSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                annotations: {alwaysOutside: true}, 
+                colors: ['grey'],
+                title: 'Difference in Health Spending',
+                vAxis: {title: 'Dollar Difference in Spending (Millions)'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("hg_spending_div"));
+            chart.draw(data, options);
+        } //hgSpendingResponseHandler
+
+        function educomboResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true})
+
+            var options = {
+            title: "Examining Growth",
+            pointSize:10,
+            backgroundColor:"none",
+            hAxis: {pointSize:10},
+            vAxes: {0: {title:"Growth in Percent Values"},
+                    1: {title:"Growth in Absolute Values"}
+                   },
+            series: {0:{type : 'line', targetAxisIndex:0},
+                     1:{type : 'bars', targetAxisIndex:1}
+                    },
+            colors: ["red", "blue"]
+                        };
+
+            var chart = new google.visualization.ComboChart(document.getElementById('educombo_div'));
+            chart.draw(data, options);
+        }//educomboResponseHandler
+
+        function healthcomboResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true})
+
+            var options = {
+            title: "Examining Growth",
+            pointSize:10,
+            backgroundColor:"none",
+            hAxis: {pointSize:10},
+            vAxes: {0: {title:"Growth in Percent Values"},
+                    1: {title:"Growth in Absolute Values"}
+                   },
+            series: {0:{type : 'line', targetAxisIndex:0},
+                     1:{type : 'bars', targetAxisIndex:1}
+                    },
+            colors: ["red", "blue"]
+                    };
+
+            var chart = new google.visualization.ComboChart(document.getElementById('healthcombo_div'));
+            chart.draw(data, options);
+        }//healthcomboResponseHandler
+
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="header">
+            <div id="logo">
+                <div id="logo_text">
+                    <h1><a href="index.html">Visualization Project</a></h1>
+                </div><!-- logo_text -->
+            </div><!-- logo-->
+            <div id="menubar">
+                <ul id="menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="percapita.html">Per Capita Spending</a></li>
+                    <li class="selected"><a href="growth.html">Growth</a></li>
+                    <li><a href="prediction.html">Prediction</a></li>
+                    <li><a href="conclusion.html">Conclusion</a></li>
+                </ul><!-- menu -->  
+            </div><!-- menu -->
+        </div><!-- header -->
+        <div id="site_content">
+            <div id="content">
+    <p><br>
+        This section explores the nations' growth in education and health spending in absolute and percent values.<br><br>First, the dollar difference amount is calculated by subtracting the values of the year 2014 from those in 2018. Then, the growth factor is calculated using the given formula - <br><strong><sup>(Spending in 2018 - Spending in 2014)</sup>&frasl;<sub>Spending in 2014</sub></strong><br><br>
+        It should be noted that values on the graphs depicting "Dollar Difference" are in Millions (USD). For instance, United States had incurred a difference of $122,177.81 in education spending over the given period, which represents a US dollar value of 122,177,810,000 (122 billion USD). 
+    </p>
+    <h3 style='text-align:center'>Overall Dollar Difference in Education Spending</h3><!--Adding Headings-->
+    <div id="eg_spending_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Growth in Education Spending </h3>
+    <div id="educombo_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Overall Dollar Difference in Healthcare Spending</h3>
+    <div id="hg_spending_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Growth in Healthcare Spending</h3>
+    <div id="healthcombo_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Key Insights</h3>
+    <p>
+        1.&nbsp;&nbsp;USA has a high overall dollar difference in both education and healthcare spending (2018 - 2014).<br>
+        2.&nbsp;&nbsp;China ranks first in both growth in education and healthcare spending over the given time period.<br> 
+        3.&nbsp;&nbsp;Russia ranks the lowest in both education and healthcare spending. Infact, Russia's education and healthcare spending has shrunk by approximately 20% and 16.7% respectively.<br><br>
+
+        It can be concluded that China has proactively increased its education expenditure over the given period of time. This can be attributed to the fact that a large amount of funding was allocated to compulsory education and higher education.<br> 
+        Similarly, China's health expenditure has soared over the given period. Research shows that this mainly due rising air pollution and more number of aging individuals. These two reasons have caused a lot more money being allocated towards health services.  
+    </p>
+</div><!-- content -->
+</div><!-- site_content -->
+<div id="content_footer">
+    <div id="footer">
+        &copy; <script>var d = new Date(); document.write(d.getFullYear());</script> 
+        | <a href="http://validator.w3.org/check?uri=referer">HTML5</a>
+        | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS3</a>
+        | Arushi Kapoor
+    </div><!-- footer -->
+</div><!-- content_footer --> 
+</div> <!-- main -->
+</body><!--body-->
+</html> <!--html--> 
