@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1024, initial-scale=1.0">
+    <title>Overview</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', {'packages': ['corechart', 'geochart']});
+        google.charts.setOnLoadCallback(drawAllSheets);
+
+        function drawAllSheets() {
+            drawSheetName('countries', 'SELECT A,B,C,D,E,F,G,H,I,J,K', lineGDPResponseHandler);
+            drawSheetName('mil_comparison', 'SELECT A,B,C,D,E,F,G,H,I,J,K', linemilResponseHandler);
+            drawSheetName('edu_comparison', 'SELECT A,B,C,D,E,F,G,H,I,J,K', lineeduResponseHandler);
+            drawSheetName('health_comparison','SELECT A,B,C,D,E,F,G,H,I,J,K', linehealthResponseHandler);
+            drawSheetName('countries', 'SELECT M,N,O,P,Q,R,S,T,U,V,W', lineSpendingResponseHandler);
+            drawSheetName('totalspending', 'SELECT A,G,O', totalSpendingResponseHandler);
+            drawSheetName('militaryspending', 'SELECT A,G,O', educSpendingResponseHandler);
+            drawSheetName('militaryspending', 'SELECT A,G,W', healthSpendingResponseHandler);
+        } //drawAllSheets
+
+        function drawSheetName(sheetName, query, responseHandler){
+            var queryString =encodeURIComponent(query);
+            var query = new google.visualization.Query(
+                'https://docs.google.com/spreadsheets/d/1bnXp3KjjQwR_d0VO_wCrhURjjAzWk60QoO0QnJ9dQ-c/gviz/tq?sheet='
+                + sheetName + '&headers=1&tq=' + queryString);
+
+            query.send(responseHandler);
+        } //drawSheetName
+
+        function checkError(response){
+            if (response.isError()) {
+                alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                return;
+            }
+
+        } //checkError
+
+        function lineGDPResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+            var options = {  
+                legend: {position: 'top', maxLines: 3}, 
+                title: 'Total GDP',
+                vAxis: {title: 'GDP in Millions (USD)'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById("total_gdp_div"));
+            chart.draw(data, options);
+        } //lineGDPResponseHandler
+
+        function linemilResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                title: 'Military Spending',
+                vAxis: {title: 'Military Spending in Millions (USD)'}, 
+                hAxis: {title: 'Years'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById("total_mil_div"));
+            chart.draw(data, options);
+        } //linemilResponseHandler
+
+        function lineeduResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                title: 'Education Spending',
+                vAxis: {title: 'Education Spending in Millions (USD)'}, 
+                hAxis: {title: 'Years'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById("total_edu_div"));
+            chart.draw(data, options);
+        } //lineeduResponseHandler
+
+        function linehealthResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                title: 'Healthcare Spending',
+                vAxis: {title: 'Total Healthcare Spending in Millions (USD)'}, 
+                hAxis: {title: 'Years'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById("total_health_div"));
+            chart.draw(data, options);
+        } //linehealthResponseHandler
+
+
+        function lineSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                title: 'Overall Spending',
+                vAxis: {title: 'Spending in Millions (USD)'}, 
+                hAxis: {title: 'Years'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById("overall_spending_div"));
+            chart.draw(data, options);
+        } //lineSpendingResponseHandler
+
+        function totalSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = {
+                legend: {position: 'top', maxLines: 3},
+                bars: 'horizontal', 
+                isStacked: true,
+                annotations: {alwaysOutside: true}, 
+                title: 'Total Spending vs. Total GDP',
+                vAxis: {title: 'Country'}, 
+                hAxis: {title: 'Spending in Millions (USD)'}
+            };
+
+            var chart = new google.visualization.BarChart(document.getElementById("total_spending_div"));
+            chart.draw(data, options);
+        } //totalSpendingResponseHandler
+
+        function educSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3},
+                annotations: {alwaysOutside: true}, 
+                title: 'Military Spending vs. Education Spending',
+                colors: ['blue','green'],
+                vAxis: {title: 'Spending in Millions (USD)'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("educ_spending_div"));
+            chart.draw(data, options);
+        } //educSpendingResponseHandler
+
+        function healthSpendingResponseHandler(response){
+            checkError(response);
+            var data = response.getDataTable();
+            data.sort({column: 1, desc: true});
+
+            var options = { 
+                legend: {position: 'top', maxLines: 3}, 
+                annotations: {alwaysOutside: true}, 
+                colors: ['blue','green'],
+                title: 'Military Spending vs. Health Spending',
+                vAxis: {title: 'Spending in Millions (USD)'}, 
+                hAxis: {title: 'Country'}
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById("health_spending_div"));
+            chart.draw(data, options);
+        } //healthSpendingResponseHandler
+
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="header">
+            <div id="logo">
+                <div id="logo_text">
+                    <h1><a href="index.html">Visualization Project</a></h1>
+                </div><!-- logo_text -->
+            </div><!-- logo-->
+            <div id="menubar">
+                <ul id="menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="selected"><a href="overview.html">Overview</a></li>
+                    <li><a href="percapita.html">Per Capita Spending</a></li>
+                    <li><a href="growth.html">Growth</a></li>
+                    <li><a href="prediction.html">Prediction</a></li>
+                    <li><a href="conclusion.html">Conclusion</a></li>
+                </ul><!-- menu -->  
+            </div><!-- menu -->
+        </div><!-- header -->
+        <div id="site_content">
+            <div id="content">
+    <p><br>
+        This section explores the nations' overall spending in comparison to its total GDP as well as its' overall military spending in comparison to its' overall health and education expenditures.<br><br>First, the total GDP, military spending, education spending, healthcare spending and overall spending is compared using line charts.<br><br>
+        Then, average of total GDP, total spending, military spending, education spending and healthcare spending are calculated for each country over the given time period. These comparisons are visualized through column charts.<br><br>
+        It should be noted that values on the graphs are in Millions (USD). For instance, in 2014, United States had a total GDP of $17,527,163.70, which represents a US dollar value of 17,527,163,700,000 (17 trillion USD). 
+    </p>
+
+    <h3 style='text-align:center'>Total GDP</h3><!--Adding Headings-->
+    <div id="total_gdp_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Military Spending</h3>
+    <div id="total_mil_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Education Spending</h3>
+    <div id="total_edu_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Healthcare Spending</h3>
+    <div id="total_health_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Overall Spending</h3>
+    <div id="overall_spending_div" style="width: 900px; height:500px;"></div><br>
+    <br>
+    <h3 style='text-align:center'>Total Spending vs. Total GDP</h3>
+    <div id="total_spending_div" style="width: 900px; height:500px;"></div><br>
+    <br>
+    <h3 style='text-align:center'>Military Spending vs. Education Spending</h3>
+    <div id="educ_spending_div" style="width: 900px; height:500px;"></div><br>
+    <br>
+    <h3 style='text-align:center'>Military Spending vs. Healthcare Spending</h3>
+    <div id="health_spending_div" style="width: 900px; height:500px;"></div>
+    <br>
+    <h3 style='text-align:center'>Key Insights</h3>
+    <p>
+    The following can be observed from the above visuals - 
+    <br>
+    1.&nbsp;&nbsp;USA has been consistently leading in total GDP, military spending, education spending, health spending and overall spending for the given time period.<br>
+    2.&nbsp;&nbsp;China ranks second in total GDP, military spending, education spending, health spending and overall spending for the given time period.<br>
+    3.&nbsp;&nbsp;USA has the highest average military spending, health spending and education spending for the given period.<br>
+    4.&nbsp;&nbsp;China has the second highest military spending, health spending and education spending for the given period.<br>
+    5.&nbsp;&nbsp;Though Russia ranks third in military spending, it ranks the lowest in healthcare spending, education spending and overall spending for the given time period.<br><br>
+
+    It can be concluded that, countries such as Russia, prioritize military expenditure over health and education expenditures as compared to other nations in focus. The nation is known to
+    have allocated an exorbitant amount towards its defence budget, especially since 2014 owing to its interference in Ukraine. 
+    United States has spent a large amount on its troops in the given period. This can be attributed to its' conflicts and interventions in Iraq. However, it is observed to have spent a lot more on education and health expenditures. 
+    </p>
+</div><!-- content -->
+</div><!-- site_content -->
+<div id="content_footer">
+    <div id="footer">
+        &copy; <script>var d = new Date(); document.write(d.getFullYear());</script> 
+        | <a href="http://validator.w3.org/check?uri=referer">HTML5</a>
+        | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS3</a>
+        | Arushi Kapoor
+    </div><!-- footer -->
+</div><!-- content_footer --> 
+</div> <!-- main -->
+</body><!--body-->
+</html><!--html-->
